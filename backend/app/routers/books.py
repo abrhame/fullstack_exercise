@@ -5,7 +5,20 @@ import database
 router = APIRouter()
 
 # ... (Previous code)
+@router.get("/books/")
+async def get_all_books():
+    try:
+        connection = database.connect_to_database()
+        cursor = connection.cursor()
+        cursor.execute('SELECT id, title, status FROM books')
+        books_data = cursor.fetchall()
+        connection.close()
 
+        # Convert the data into a list of Book models
+        books = [models.Book(*book_data) for book_data in books_data]
+        return books
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 # Create a new book entry
 @router.post("/books/")
 async def create_book(book: models.Book):

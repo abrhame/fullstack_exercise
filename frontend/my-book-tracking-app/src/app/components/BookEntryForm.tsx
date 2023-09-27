@@ -1,5 +1,5 @@
-"use client"
 import { FC, useState } from 'react';
+import axios from 'axios';
 
 interface BookEntryFormProps {
   onAddBook: (title: string) => void;
@@ -7,13 +7,11 @@ interface BookEntryFormProps {
 
 const BookEntryForm: FC<BookEntryFormProps> = ({ onAddBook }) => {
   const [title, setTitle] = useState('');
-
-  const handleSubmit = (e: React.FormEvent) => {
+  const id = 0
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim() !== '') {
-      onAddBook(title);
-      setTitle('');
-    }
+    onAddBook(title);
+    setTitle('');
   };
 
   return (
