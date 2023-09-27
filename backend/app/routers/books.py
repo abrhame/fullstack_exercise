@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/books/")
 async def create_book(book: models.Book):
     try:
-        connection = connect_to_database()
+        connection = database.connect_to_database()
         cursor = connection.cursor()
         cursor.execute('INSERT INTO books (title, status) VALUES (?, ?)', (book.title, book.status))
         connection.commit()
@@ -23,14 +23,14 @@ async def create_book(book: models.Book):
 @router.get("/books/{book_id}")
 async def read_book(book_id: int = Path(..., title="The ID of the book to retrieve")):
     try:
-        connection = connect_to_database()
+        connection = database.connect_to_database()
         cursor = connection.cursor()
         cursor.execute('SELECT id, title, status FROM books WHERE id = ?', (book_id,))
         book_data = cursor.fetchone()
         connection.close()
         if not book_data:
             raise HTTPException(status_code=404, detail="Book not found")
-        book = Book(*book_data)
+        book = models.Book(*book_data)
         return book
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
@@ -42,7 +42,7 @@ async def update_book_status(
     status: str = Query(..., title="The new status of the book"),
 ):
     try:
-        connection = connect_to_database()
+        connection = database.connect_to_database()
         cursor = connection.cursor()
         cursor.execute('UPDATE books SET status = ? WHERE id = ?', (status, book_id))
         connection.commit()
@@ -55,7 +55,7 @@ async def update_book_status(
 @router.delete("/books/{book_id}")
 async def delete_book(book_id: int = Path(..., title="The ID of the book to delete")):
     try:
-        connection = connect_to_database()
+        connection = database.connect_to_database()
         cursor = connection.cursor()
         cursor.execute('DELETE FROM books WHERE id = ?', (book_id,))
         connection.commit()
